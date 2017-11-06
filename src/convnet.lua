@@ -182,11 +182,6 @@ function ConvNet:build(job, init_depth, init_len, num_targets)
         -- nonlinearity
         self.model:add(nn.ReLU())
 
-        -- dropout
-        if self.conv_dropouts[i] > 0 then
-            self.model:add(nn.Dropout(self.conv_dropouts[i]))
-        end
-
         -- pooling
         if self.pool_width[i] > 1 then
             if self.pool_op == "max" then
@@ -201,6 +196,11 @@ function ConvNet:build(job, init_depth, init_len, num_targets)
             end
 
             seq_len = pseq_len
+        end
+
+        -- dropout
+        if self.conv_dropouts[i] > 0 then
+            self.model:add(nn.Dropout(self.conv_dropouts[i]))
         end
 
         -- update helper
