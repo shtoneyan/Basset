@@ -93,45 +93,46 @@ def main():
             peak_bed_in = open(peak_beds[bi])
 
         for line in peak_bed_in:
-            a = line.split('\t')
-            a[-1] = a[-1].rstrip()
+            if not line.startswith('#'):
+                a = line.split('\t')
+                a[-1] = a[-1].rstrip()
 
-            # hash by chrom/strand
-            chrom = a[0]
-            strand = '+'
-            if len(a) > 5 and a[5] in '+-':
-                strand = a[5]
-            chrom_key = (chrom,strand)
+                # hash by chrom/strand
+                chrom = a[0]
+                strand = '+'
+                if len(a) > 5 and a[5] in '+-':
+                    strand = a[5]
+                chrom_key = (chrom,strand)
 
-            # adjust coordinates to midpoint
-            start = int(a[1])
-            end = int(a[2])
-            mid = find_midpoint(start, end)
-            a[1] = str(mid)
-            a[2] = str(mid + 1)
+                # adjust coordinates to midpoint
+                start = int(a[1])
+                end = int(a[2])
+                mid = find_midpoint(start, end)
+                a[1] = str(mid)
+                a[2] = str(mid + 1)
 
-            # open chromosome file
-            if chrom_key not in chrom_outs:
-                chrom_files[chrom_key] = '%s_%s_%s.bed' % (options.out_prefix, chrom, strand)
-                chrom_outs[chrom_key] = open(chrom_files[chrom_key], 'w')
+                # open chromosome file
+                if chrom_key not in chrom_outs:
+                    chrom_files[chrom_key] = '%s_%s_%s.bed' % (options.out_prefix, chrom, strand)
+                    chrom_outs[chrom_key] = open(chrom_files[chrom_key], 'w')
 
-            # if it's the db bed
-            if db_add and bi == len(peak_beds)-1:
-                if options.no_db_activity:
-                    # set activity to null
-                    a[6] = '.'
-                    print >> chrom_outs[chrom_key], '\t'.join(a[:7])
+                # if it's the db bed
+                if db_add and bi == len(peak_beds)-1:
+                    if options.no_db_activity:
+                        # set activity to null
+                        a[6] = '.'
+                        print >> chrom_outs[chrom_key], '\t'.join(a[:7])
+                    else:
+                        print >> chrom_outs[chrom_key], line,
+
+                # if it's a new bed
                 else:
-                    print >> chrom_outs[chrom_key], line,
-
-            # if it's a new bed
-            else:
-                # specify the target index
-                while len(a) < 7:
-                    a.append('')
-                a[5] = strand
-                a[6] = str(target_dbi[bi])
-                print >> chrom_outs[chrom_key], '\t'.join(a[:7])
+                    # specify the target index
+                    while len(a) < 7:
+                        a.append('')
+                    a[5] = strand
+                    a[6] = str(target_dbi[bi])
+                    print >> chrom_outs[chrom_key], '\t'.join(a[:7])
 
         peak_bed_in.close()
 

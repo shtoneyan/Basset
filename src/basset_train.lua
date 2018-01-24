@@ -20,6 +20,7 @@ cmd:option('-cudnn', false, 'Run on GPGPU w/ cuDNN')
 cmd:option('-drop_rate', false, 'Decrease the learning_rate when training loss stalls')
 cmd:option('-job', '', 'Table of job hyper-parameters')
 cmd:option('-max_epochs', 1000, 'Maximum training epochs to perform')
+cmd:option('-rc', false, 'Alternate forward and reverse complement epochs')
 cmd:option('-restart', '', 'Restart an interrupted training run')
 cmd:option('-result', '', 'Write the loss value to this file (useful for Bayes Opt)')
 cmd:option('-save', 'dnacnn', 'Prefix for saved models')
@@ -138,14 +139,21 @@ local acc_best = 0
 local train_loss_last
 local valid_loss
 local valid_acc
+local fwdrc
 local batcher = Batcher:__init(train_seqs, train_targets, convnet.batch_size, false)
 
 while epoch <= opt.max_epochs and epoch - epoch_best <= opt.stagnant_t do
     io.write(string.format("Epoch #%3d   ", epoch))
     local start_time = sys.clock()
 
+    -- alternate forward and reverse batches
+    fwdrc = true
+    if opt.rc and epoch % 2 == 0 then
+        fwdrc = false
+    end
+
     -- conduct one training epoch
-    local train_loss = convnet:train_epoch(batcher)
+    local train_loss = convnet:train_epoch(batcher, fwdrc)
     io.write(string.format("train loss = %7.3f, ", train_loss))
 
     if job.mc_n ~= nil and job.mc_n > 1 then
@@ -160,7 +168,7 @@ while epoch <= opt.max_epochs and epoch - epoch_best <= opt.stagnant_t do
         convnet.model:evaluate()
 
         -- measure accuracy on a test set
-        valid_loss, valid_acc, valid_cor = convnet:test(valid_seqs, valid_targets)
+        valid_loss, valid_acc, valid_cor = convnet:test(valid_seqs, valid_targets, nil, opt.rc)
     end
 
     local valid_acc_avg = torch.mean(valid_acc)

@@ -998,7 +998,7 @@ end
 -- Train the model for one epoch through the data specified by
 -- batcher.
 ----------------------------------------------------------------
-function ConvNet:train_epoch(batcher)
+function ConvNet:train_epoch(batcher, fwdrc)
     local total_loss = 0
 
     -- collect garbage occasionaly
@@ -1014,6 +1014,11 @@ function ConvNet:train_epoch(batcher)
         if cuda then
             inputs = inputs:cuda()
             targets = targets:cuda()
+        end
+
+        -- reverse complement the sequences
+        if not fwdrc then
+            inputs = self:rc_seqs(inputs)
         end
 
         -- create closure to evaluate f(X) and df/dX
