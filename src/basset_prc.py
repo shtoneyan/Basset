@@ -2,6 +2,7 @@
 from __future__ import print_function
 from optparse import OptionParser
 import h5py
+import pdb
 import os
 
 import matplotlib
@@ -25,6 +26,7 @@ def main():
     usage = 'usage: %prog [options] <test_hdf5> <test_preds>'
     parser = OptionParser(usage)
     parser.add_option('-o', dest='out_dir', default='prc')
+    parser.add_option('-v', dest='valid', default=False, action='store_true', help='Process validation set [Default: %default]')
     (options,args) = parser.parse_args()
 
     if len(args) != 2:
@@ -40,13 +42,16 @@ def main():
     # input targets and predictions
     #############################################
     h5_in = h5py.File(hdf5_file)
-    targets = h5_in['test_out']
+    if options.valid:
+        targets = h5_in['valid_out']
+    else:
+        targets = h5_in['test_out']
     if type(h5_in['target_labels'][0]) == np.bytes_:
         target_labels = np.array([label.decode('UTF-8') for label in h5_in['target_labels']])
     else:
         target_labels = np.array(h5_in['target_labels'])
 
-    preds = np.genfromtxt(preds_file, delimiter='\t', dtype='float16')
+    preds = np.loadtxt(preds_file, dtype='float16')
 
     #############################################
     # make all PRC plots
