@@ -23,6 +23,7 @@ cmd:option('-cuda', false, 'Run on GPGPU')
 cmd:option('-cudnn', false, 'Run on GPGPU w/ cuDNN')
 cmd:option('-mc_n', 0, 'Perform MCMC prediction')
 cmd:option('-rc', false, 'Average forward and reverse complement')
+cmd:option('-valid', false, 'Test on the validation set')
 cmd:text()
 opt = cmd:parse(arg)
 
@@ -37,6 +38,10 @@ require 'convnet'
 local data_open = hdf5.open(opt.data_file, 'r')
 local test_targets = data_open:read('test_out')
 local test_seqs = data_open:read('test_in')
+if opt.valid then
+   test_targets = data_open:read('valid_out')
+   test_seqs = data_open:read('valid_in')
+end
 
 ----------------------------------------------------------------
 -- construct model
