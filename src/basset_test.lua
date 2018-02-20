@@ -23,7 +23,7 @@ cmd:option('-cuda', false, 'Run on GPGPU')
 cmd:option('-cudnn', false, 'Run on GPGPU w/ cuDNN')
 cmd:option('-mc_n', 0, 'Perform MCMC prediction')
 cmd:option('-rc', false, 'Average forward and reverse complement')
-cmd:option('-valid', false, 'Test on the validation set')
+cmd:option('-valid', false, 'Process the validation rather than test set')
 cmd:text()
 opt = cmd:parse(arg)
 
