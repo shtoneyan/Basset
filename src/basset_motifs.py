@@ -625,13 +625,17 @@ def plot_filter_logo(filter_outs, filter_size, seqs, out_prefix, raw_t=0, maxpct
         all_outs_norm = all_outs - all_outs_mean
         raw_t = maxpct_t * all_outs_norm.max() + all_outs_mean
 
+    # SAME padding
+    pad_side = (filter_size - 1) // 2
+
     # print fasta file of positive outputs
     filter_fasta_out = open('%s.fa' % out_prefix, 'w')
     filter_count = 0
     for i in range(filter_outs.shape[0]):
-        for j in range(filter_outs.shape[1]):
+        for j in range(pad_side, filter_outs.shape[1]-pad_side):
             if filter_outs[i,j] > raw_t:
-                kmer = seqs[i][j:j+filter_size]
+                js = j - pad_side
+                kmer = seqs[i][js:js+filter_size]
                 print >> filter_fasta_out, '>%d_%d' % (i,j)
                 print >> filter_fasta_out, kmer
                 filter_count += 1
