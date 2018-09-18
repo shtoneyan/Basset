@@ -105,7 +105,7 @@ def main():
     if options.dense_table:
         sad_out = open('%s/sad_table.txt' % options.out_dir, 'w')
     else:
-        header_cols = ('rsid', 'index', 'score', 'ref', 'alt', 'target', 'ref_pred', 'alt pred', 'sad')
+        header_cols = ('rsid', 'index', 'score', 'ref', 'alt', 'target', 'ref_pred', 'alt_pred', 'sad')
         if options.csv:
             sad_out = open('%s/sad_table.csv' % options.out_dir, 'w')
             print(','.join(header_cols), file=sad_out)
