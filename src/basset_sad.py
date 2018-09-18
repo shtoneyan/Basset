@@ -87,11 +87,18 @@ def main():
         print(cmd)
         subprocess.call(cmd, shell=True)
 
+        # clean up
+        os.remove('%s/model_in.h5'%options.out_dir)
+
     # read in predictions
     seq_preds = []
     for line in open(options.model_hdf5_file):
-        seq_preds.append(np.array([np.float16(p) for p in line.split()]))
-    seq_preds = np.array(seq_preds)
+        # seq_preds.append(np.array([np.float16(p) for p in line.split()]))
+        seq_preds.append(np.array([float(p) for p in line.split()], dtype='float16'))
+    seq_preds = np.array(seq_preds, dtype='float16')
+
+    # clean up
+    os.remove(options.model_hdf5_file)
 
 
     #################################################################

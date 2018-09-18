@@ -24,6 +24,7 @@ cmd:option('-mc_n', 0, 'Perform MCMC prediction')
 cmd:option('-norm', false, 'Normalize all targets to a level plane')
 cmd:option('-rc', false, 'Average forward and reverse complement')
 cmd:option('-scores', false, 'Print scores instead of predictions')
+cmd:option('-valid', false, 'Process the validation rather than test set')
 cmd:text()
 opt = cmd:parse(arg)
 
@@ -36,7 +37,13 @@ require 'convnet'
 -- load data
 ----------------------------------------------------------------
 local data_open = hdf5.open(opt.data_file, 'r')
-local test_seqs = data_open:read('test_in')
+local test_seqs
+
+if opt.valid then
+    test_seqs = data_open:read('valid_in')
+else
+    test_seqs = data_open:read('test_in')
+end
 
 ----------------------------------------------------------------
 -- construct model
