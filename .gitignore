@@ -1,5 +1,6 @@
 *~
 *.pyc
+**/._*
 data/encode*
 data/genomes/hg19.fa*
 data/roadmap*

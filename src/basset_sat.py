@@ -270,7 +270,7 @@ def main():
                 # plot real-normalized scores
                 vlim = max(options.min_limit, abs(norm_matrix).max())
                 sns.heatmap(norm_matrix, linewidths=0, cmap='RdBu_r', vmin=-vlim, vmax=vlim, xticklabels=False, ax=ax_heat)
-                ax_heat.yaxis.set_ticklabels('TGCA', rotation='horizontal') # , size=10)
+                ax_heat.yaxis.set_ticklabels('ACGT', rotation='horizontal') # , size=10)
 
                 # save final figure
                 plt.tight_layout()
