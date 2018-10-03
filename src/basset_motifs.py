@@ -604,7 +604,7 @@ def plot_filter_heat(param_matrix, out_pdf):
     sns.heatmap(param_matrix, cmap='PRGn', linewidths=0.2, vmin=-param_range, vmax=param_range)
     ax = plt.gca()
     ax.set_xticklabels(range(1,param_matrix.shape[1]+1))
-    ax.set_yticklabels('TGCA', rotation='horizontal') # , size=10)
+    ax.set_yticklabels('ACGT', rotation='horizontal') # , size=10)
     plt.savefig(out_pdf)
     plt.close()
 
