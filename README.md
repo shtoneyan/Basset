@@ -8,6 +8,13 @@ Basset provides researchers with tools to:
 1. Train deep convolutional neural networks to learn highly accurate models of DNA sequence activity such as accessibility (via DNaseI-seq or ATAC-seq), protein binding (via ChIP-seq), and chromatin state.
 2. Interpret the principles learned by the model.
 
+Read more about the method in the manuscript here:
+[DR Kelley, J Snoek, JL Rinn. Basset: learning the regulatory code of the accessible genome with deep convolutional neural networks. Genome Research 26 (7), 990-999.](https://genome.cshlp.org/content/26/7/990.short)
+
+As well as follow up work here:
+[DR Kelley, YA Reshef, M Bileschi, D Belanger, CY McLean, J Snoek. Sequential regulatory activity prediction across chromosomes with convolutional neural networks. Genome Research 28 (5), 739-750](https://genome.cshlp.org/content/28/5/739.short)
+Which has an associated [repo where continued development on this toolkit now occurs.](https://github.com/calico/basenji)
+
 ---------------------------------------------------------------------------------------------------
 ### Installation
 
