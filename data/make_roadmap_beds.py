@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 from optparse import OptionParser
 import os
 import pandas as pd
@@ -18,7 +19,7 @@ def main():
     #parser.add_option()
     (options,args) = parser.parse_args()
 
-    df = pd.read_excel('jul2013.roadmapData.qc.xlsx', sheetname='Consolidated_EpigenomeIDs_summa')
+    df = pd.read_excel('jul2013.roadmapData.qc.xlsx', sheet_name='Consolidated_EpigenomeIDs_summa')
 
     beds_out = open('roadmap_beds.txt', 'w')
 
@@ -27,7 +28,7 @@ def main():
 
     	peaks_bed = 'roadmap/%s-DNase.hotspot.fdr0.01.peaks.bed.gz' % eid
     	if os.path.isfile(peaks_bed):
-    		print >> beds_out, df.iloc[i,5], '\t', peaks_bed
+    		print('%s\t%s' % (df.iloc[i,5], peaks_bed), file=beds_out)
 
     beds_out.close()
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 from optparse import OptionParser
 
 ################################################################################
@@ -40,7 +41,7 @@ def main():
         cell = cell.replace('Adult_','')
         cell = cell.replace('_Mobilized','')
 
-        print >> beds_out, '%s\t%s' % (cell, bedfile)
+        print('%s\t%s' % (cell, bedfile), file=beds_out)
 
     beds_out.close()
 
