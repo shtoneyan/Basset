@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
+import pdb
+import random
 import sys
 from collections import OrderedDict
 
@@ -127,7 +129,7 @@ def dna_one_hot(seq, seq_len=None):
     return seq_vec
 '''
 
-def dna_one_hot(seq, seq_len=None, flatten=True):
+def dna_one_hot(seq, seq_len=None, flatten=True, n_random=True):
     if seq_len == None:
         seq_len = len(seq)
         seq_start = 0
@@ -142,22 +144,29 @@ def dna_one_hot(seq, seq_len=None, flatten=True):
 
     seq = seq.upper()
 
-    seq = seq.replace('A','0')
-    seq = seq.replace('C','1')
-    seq = seq.replace('G','2')
-    seq = seq.replace('T','3')
+    # map nt's to a matrix len(seq)x4 of 0's and 1's.
+    if n_random:
+        seq_code = np.zeros((seq_len, 4), dtype='bool')
+    else:
+        seq_code = np.zeros((seq_len, 4), dtype='float16')
 
-    # map nt's to a matrix 4 x len(seq) of 0's and 1's.
-    #  dtype='int8' fails for N's
-    seq_code = np.zeros((4,seq_len), dtype='float16')
     for i in range(seq_len):
-        if i < seq_start:
-            seq_code[:,i] = 0.25
-        else:
-            try:
-                seq_code[int(seq[i-seq_start]),i] = 1
-            except:
-                seq_code[:,i] = 0.25
+        if i >= seq_start and i - seq_start < len(seq):
+            nt = seq[i - seq_start]
+            if nt == 'A':
+                seq_code[i, 0] = 1
+            elif nt == 'C':
+                seq_code[i, 1] = 1
+            elif nt == 'G':
+                seq_code[i, 2] = 1
+            elif nt == 'T':
+                seq_code[i, 3] = 1
+            else:
+                if n_random:
+                    ni = random.randint(0,3)
+                    seq_code[i, ni] = 1
+                else:
+                    seq_code[i,:] = 0.25
 
     # flatten and make a column vector 1 x len(seq)
     if flatten:
