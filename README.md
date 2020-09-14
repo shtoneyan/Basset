@@ -17,6 +17,7 @@ As well as follow up work here:
 [DR Kelley, YA Reshef, M Bileschi, D Belanger, CY McLean, J Snoek. Sequential regulatory activity prediction across chromosomes with convolutional neural networks. Genome Research 28 (5), 739-750](https://genome.cshlp.org/content/28/5/739.short)
 
 Which has an associated [repo where continued development on this toolkit now occurs.](https://github.com/calico/basenji)
+You can now run Basset-style peak prediction using Basenji, and I recommend using that software because I can better support it. [See here.](https://github.com/calico/basenji/manuscripts/basset).
 
 ---------------------------------------------------------------------------------------------------
 ### Installation
