@@ -35,9 +35,9 @@ def main():
     (options,args) = parser.parse_args()
 
     if len(args) != 1:
-    	parser.error('Must provide file labeling the targets and providing BED file paths.')
+        parser.error('Must provide file labeling the targets and providing BED file paths.')
     else:
-    	target_beds_file = args[0]
+        target_beds_file = args[0]
 
     # determine whether we'll add to an existing DB
     db_targets = []
@@ -49,6 +49,7 @@ def main():
                 parser.error('Must provide both activity table or specify -n if you want to add to an existing database')
             else:
                 # read db target names
+                print('options.db_act_file', options.db_act_file)
                 db_act_in = open(options.db_act_file)
                 db_targets = db_act_in.readline().strip().split('\t')
                 db_act_in.close()
@@ -57,14 +58,14 @@ def main():
     target_beds = []
     target_dbi = []
     for line in open(target_beds_file):
-    	a = line.split()
+        a = line.split()
         if len(a) != 2:
-            print a
+            print(a)
             print >> sys.stderr, 'Each row of the target BEDS file must contain a label and BED file separated by whitespace'
             exit(1)
-    	target_dbi.append(len(db_targets))
-    	db_targets.append(a[0])
-    	target_beds.append(a[1])
+        target_dbi.append(len(db_targets))
+        db_targets.append(a[0])
+        target_beds.append(a[1])
 
     # read in chromosome lengths
     chrom_lengths = {}
@@ -85,22 +86,22 @@ def main():
     peak_beds = target_beds
     if db_add:
         peak_beds.append(options.db_bed)
-
     for bi in range(len(peak_beds)):
+        print(bi)
         if peak_beds[bi][-3:] == '.gz':
-            peak_bed_in = gzip.open(peak_beds[bi])
+            peak_bed_in = gzip.open(peak_beds[bi], 'rt') # open a given compressed bed file
         else:
             peak_bed_in = open(peak_beds[bi])
-
         for line in peak_bed_in:
             if not line.startswith('#'):
                 a = line.split('\t')
-                a[-1] = a[-1].rstrip()
+                a[-1] = a[-1].rstrip() # remove trailing \n
+                # example a ['chr1', '564665', '564815', '.', '0', '.', '55.000000', '-1', '-1', '-1\n']
 
                 # hash by chrom/strand
                 chrom = a[0]
                 strand = '+'
-                if len(a) > 5 and a[5] in '+-':
+                if len(a) > 5 and a[5] in '+-': # if strand info is there change the default + to the strand
                     strand = a[5]
                 chrom_key = (chrom,strand)
 
@@ -108,15 +109,14 @@ def main():
                 start = int(a[1])
                 end = int(a[2])
                 mid = find_midpoint(start, end)
-                a[1] = str(mid)
-                a[2] = str(mid + 1)
-
+                a[1] = str(int(mid)) #new start at the center of the peak
+                a[2] = str(int(mid) + 1) # new end 1 position after start
                 # open chromosome file
                 if chrom_key not in chrom_outs:
                     chrom_files[chrom_key] = '%s_%s_%s.bed' % (options.out_prefix, chrom, strand)
                     chrom_outs[chrom_key] = open(chrom_files[chrom_key], 'w')
-
-                # if it's the db bed
+                    #e.g. chrom_files[chrom_key] = er_chr1_+.bed
+                # if it's the db bed (which it is not)
                 if db_add and bi == len(peak_beds)-1:
                     if options.no_db_activity:
                         # set activity to null
@@ -125,16 +125,19 @@ def main():
                     else:
                         print >> chrom_outs[chrom_key], line,
 
-                # if it's a new bed
+                # if it's a new bed (which it is)
                 else:
                     # specify the target index
                     while len(a) < 7:
                         a.append('')
                     a[5] = strand
                     a[6] = str(target_dbi[bi])
-                    print >> chrom_outs[chrom_key], '\t'.join(a[:7])
+                    #print('\t'.join(a[:7]))
+                    #chrX	154842620.0	154842621.0	.	0	+	0
+                    print('\t'.join(a[:7]), file=chrom_outs[chrom_key])
 
         peak_bed_in.close()
+
 
     # close chromosome-specific files
     for chrom_key in chrom_outs:
@@ -145,7 +148,7 @@ def main():
         for orient in '+-':
             chrom_key = ('chrY',orient)
             if chrom_key in chrom_files:
-                print >> sys.stderr, 'Ignoring chrY %s' % orient
+                print('Ignoring chrY %s' % orient, file=sys.stderr)
                 os.remove(chrom_files[chrom_key])
                 del chrom_files[chrom_key]
 
@@ -208,7 +211,7 @@ def main():
 
                     # print to file
                     for mpeak in mpeaks:
-                        print >> final_bed_out, mpeak.bed_str(chrom, strand)
+                        print(mpeak.bed_str(chrom, strand), file=final_bed_out)
 
                     # initialize open peak
                     open_end = peak.end
@@ -225,7 +228,7 @@ def main():
 
             # print to file
             for mpeak in mpeaks:
-                print >> final_bed_out, mpeak.bed_str(chrom, strand)
+                print(mpeak.bed_str(chrom, strand), file=final_bed_out)
 
     final_bed_out.close()
 
@@ -241,7 +244,7 @@ def main():
 
     # print header
     cols = [''] + db_targets
-    print >> final_act_out, '\t'.join(cols)
+    print('\t'.join(cols), file=final_act_out)
 
     # print sequences
     for line in open('%s.bed' % options.out_prefix):
@@ -257,7 +260,7 @@ def main():
 
         # print line
         cols = [peak_id] + peak_act
-        print >> final_act_out, '\t'.join([str(c) for c in cols])
+        print('\t'.join([str(c) for c in cols]),file=final_act_out)
 
     final_act_out.close()
 
@@ -403,7 +406,7 @@ class Peak:
             act_str = '.'
         else:
             act_str = ','.join([str(ai) for ai in sorted(list(self.act))])
-        cols = (chrom, str(self.start), str(self.end), '.', '1', strand, act_str)
+        cols = (chrom, str(int(self.start)), str(int(self.end)), '.', '1', strand, act_str)
         return '\t'.join(cols)
 
     def merge(self, peak2, ext_len, chrom_len):
@@ -436,8 +439,8 @@ class Peak:
         merge_act = self.act | peak2.act
 
         # set merge to this peak
-        self.start = merge_start
-        self.end = merge_end
+        self.start = int(merge_start)
+        self.end = int(merge_end)
         self.act = merge_act
 
 
